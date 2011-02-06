@@ -1,0 +1,28 @@
+{% load shop_tags i18n %}
+
+<p>{% trans "Dear" %} {{ order.billing_detail_first_name }},</p>
+
+<p>{% trans "Your order has been successful, details are below." %}</p>
+
+<p>{% trans "Order ID:" %} #{{ order.id }}</p>
+
+<p><span style="font-weight:bold;">{% trans "Billing Details:" %}</span><br />
+{% for field, value in order_billing_detail_fields %}
+{{ field }}: {{ value }}<br />
+{% endfor %}</p>
+
+<p><span style="font-weight:bold;">{% trans "Shipping Details:" %}</span><br />
+{% for field, value in order_shipping_detail_fields %}
+{{ field }}: {{ value }}<br />
+{% endfor %}</p>
+
+<p><span style="font-weight:bold;">{% trans "Items Ordered:" %}</span></p>
+<ul>
+	{% for item in order_items %}
+	<li>{{ item.quantity }} x {{ item.description }} {{ item.unit_price|currency }} {% trans "each" %}</li>
+	{% endfor %}
+</ul>
+
+{% order_totals %}
+
+<a href="http://{{ request.get_host }}">http://{{ request.get_host }}</a>

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load mezzanine_tags shop_tags i18n %}
+
+{% block title %}{% trans "Your cart" %}{% endblock %}
+
+{% block breadcrumb_menu %}
+<ul>
+    <li><a href="{% url home %}">{% trans "Home" %}</a> &gt;</li>
+    <li>{% trans "Your cart" %}</li>
+</ul><br />
+{% endblock %}
+
+{% block main %}
+{% if cart.has_items %}
+<table id="items" border="0" cellpadding="5" cellspacing="0">
+	<tr>
+		<th class="items-item">{% trans "Item" %}</th>
+		<th>{% trans "Unit Price" %}</th>
+		<th>{% trans "Qty" %}</th>
+		<th>{% trans "Price" %}</th>
+		<th>&nbsp;</th>
+	</tr>
+	{% for item in cart %}
+	<tr class="{% cycle 'row1' 'row2' %}">
+		<td class="items-item">
+			{% if item.image %}
+			<a href="{{ item.get_absolute_url }}"><img alt="{{ item.description }}"
+				src="{{ MEDIA_URL }}{% thumbnail item.image 30 30 %}" /></a>
+			{% endif %}
+			<a href="{{ item.get_absolute_url }}">{{ item.description }}</a>
+		</td>
+		<td>{{ item.unit_price|currency }}</td>
+		<td>{{ item.quantity }}</td>
+		<td>{{ item.total_price|currency }}</td>
+		<td class="buttons">
+			<form method="post">
+                {% csrf_token %}
+				<input type="hidden" name="item_id" value="{{ item.id }}" />
+				<input type="submit" value="{% trans "Remove" %}" />
+			</form>
+		</td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td colspan="3">{% trans "Total" %}</td>
+		<td>{{ cart.total_price|currency }}</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="5">
+			<form action="{% url shop_checkout %}">
+				<input type="submit" class="button" 
+					value="{% trans "Go to Checkout" %}" />
+			</form>
+		</td>
+	</tr>
+</table>
+{% else %}
+<p>{% trans "Your cart is empty." %}</p>
+{% endif %}
+{% endblock %}
+

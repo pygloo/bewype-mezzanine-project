@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load mezzanine_tags shop_tags i18n %}
+
+{% block meta_title %}{{ product.title }}{% endblock %}
+
+{% block meta_keywords %}{% metablock %}
+{% for keyword in product.keywords.all %}
+    {% if not forloop.first %}, {% endif %}
+    {{ keyword }}
+{% endfor %}
+{% endmetablock %}{% endblock %}
+
+{% block meta_description %}{% metablock %}
+{{ product.description }}
+{% endmetablock %}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<script type="text/javascript">
+$(function() {
+
+	var variations = {{ variations_json|safe }};
+	var selections = $('#add-cart select');
+	
+	var showImage = function(id) {
+		var image = $(id);
+		if (image.length == 1) {
+			$('#product-images-large li').hide();
+			image.show();
+		}
+	};
+	
+	// on selection of an option, reduce the list of variations to the one 
+	// matching all the selected options - if there is one, show it and hide 
+	// the others 
+	selections.change(function() {
+		var variation = $.grep(variations, function(v) {
+			var valid = true;
+			$.each(selections, function() {
+				valid = valid && v[this.name] == this[this.selectedIndex].value;
+			});
+			return valid;
+		});
+		if (variation.length == 1) {
+			$('#variations li').hide();
+			$('#variation-' + variation[0].sku).show();
+			showImage('#image-' + variation[0].image_id + '-large');
+		}
+	});
+	selections.change();
+	
+	// show enlarged image on thumbnail click
+	$('#product-images-thumb a').click(function() {
+		showImage('#' + $(this).attr('id') + '-large');
+		return false;
+	});
+	
+});
+</script>
+{% endblock %}
+
+{% block breadcrumb_menu %}
+<ul>
+    <li><a href="{% url home %}">{% trans "Home" %}</a> &gt;</li>
+    <li>{{ product.title }}</li>
+</ul><br />
+{% endblock %}
+
+{% block title %}
+{% editable product.title %}{{ product.title }}{% endeditable %}
+{% endblock %}
+
+{% block main %}
+
+{% if images %}
+<ul id="product-images-large">
+	{% for image in images %}
+	<li id="image-{{ image.id }}-large"{% if not forloop.first %} 
+		style="display:none;"{% endif %}>
+		<a href="{{ MEDIA_URL }}{{ image.file }}"><img alt="{{ image.description }}"
+			src="{{ MEDIA_URL }}{% thumbnail image.file 0 300  %}" /></a></li>
+	{% endfor %}
+</ul>
+{% ifnotequal images|length 1 %}
+<ul id="product-images-thumb">
+	{% for image in images %}
+	<li><a id="image-{{ image.id }}" 
+		href="{{ MEDIA_URL }}{{ image.file }}"><img alt="{{ image.description }}"
+		src="{{ MEDIA_URL }}{% thumbnail image.file 75 75  %}" /></a></li>
+	{% endfor %}
+</ul>
+{% endifnotequal %}
+{% endif %}
+
+{% editable product.content %}
+{{ product.content|safe }}
+{% endeditable %}
+
+{% if product.available %}
+<ul id="variations">
+	{% for variation in variations %}
+	<li id="variation-{{ variation.sku }}"
+		{% if not variation.default %}" style="display:none;"{% endif %}>
+		{% if variation.has_price %}
+			{% if variation.on_sale %}
+				<span class="old-price">{{ variation.unit_price|currency }}</span>
+				{% trans "On sale:" %}
+			{% endif %}
+			{{ variation.price|currency }}
+		{% else %}
+		{% trans "Currently unavailable." %} 
+		{% endif %}
+	</li>
+	{% endfor %}
+</ul>
+<form method="post" id="add-cart" class="form">
+    {% csrf_token %}
+	<ul>{{ add_product_form.as_ul }}</ul>
+	<input type="submit" class="button" name="add_cart" value="{% trans "Buy" %}" />
+	<input type="submit" class="button" name="add_wishlist" value="{% trans "Save for later" %}" />
+</form>
+{% else %}
+<div>{% trans "This product is currently unavailable." %}</div>
+{% endif %}
+
+{% endblock %}
