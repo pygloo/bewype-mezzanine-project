@@ -33,16 +33,33 @@
 
 </head>
 <body id="{% block body_id %}{% endblock %}">
-   
-<ul>
-    {% if user.is_authenticated %}
-        <li><a href="{% url userena_profile_detail user.username %}"><span>{% trans 'Account settings' %} ({{ user.username }})</span></a></li>
-        <li><a href="{% url userena_signout %}"><span>{% trans 'Signout' %}</span></a></li>
-    {% else %}
-        <li><a href="{% url userena_signin %}"><span>{% trans 'Signin' %}</span></a></li>
-        <li><a href="{% url userena_signup %}"><span>{% trans 'Signup' %}</span></a></li>
-    {% endif %}
-</ul>
+
+    <div class="container_12">
+        {% if user.is_authenticated %}
+            <div class="grid_1 prefix_10">
+                <a href="{% url userena_profile_detail user.username %}">
+                    <span>{% trans 'Account settings' %} ({{ user.username }})</span>
+                </a>
+            </div>
+            <div class="grid_1">
+                <a href="{% url userena_signout %}">
+                    <span>{% trans 'Signout' %}</span>
+                </a>
+            </div>
+        {% else %}
+            <div class="grid_1 prefix_10">
+                <a href="{% url userena_signin %}">
+                    <span>{% trans 'Signin' %}</span>
+                </a>
+            </div>
+            <div class="grid_1">
+                <a href="{% url userena_signup %}">
+                    <span>{% trans 'Signup' %}</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+	<div class="clear"></div>
 
 <div id="grid-top">
     {% page_menu "pages/menus/primary.html" %}
@@ -60,13 +77,6 @@
                 {% for message in messages %}
                 <li>{{ message }}<a href="#">x</a></li>
                 {% endfor %}
-                <!-- userena -->
-                {% if not user.is_authenticated %}
-                <li>
-                    <div id="try"></div>
-                </li>
-                {% endif %}
-                <!-- userena -->
             </ul>
             <h1>{% block title %}{% endblock %}</h1>
             <div id="breadcrumb-menu">
