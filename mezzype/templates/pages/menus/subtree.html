@@ -1,0 +1,12 @@
+{% load i18n pages_tags %}
+
+{% spaceless %}
+{% if page_branch %}
+	{% for page in page_branch %}
+        {% if page.in_navigation and page.is_current_or_ascendant %}
+	    	{{ page.title }}
+	    	{% page_menu page %}
+        {% endif %}
+	{% endfor %}
+{% endif %}
+{% endspaceless %}

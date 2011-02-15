@@ -29,15 +29,15 @@
             {% endfor %}
 	    </ul>
 	    {% endif %}
-	{% endwith %}
+    {% endwith %}
 
-	{% block fields %}{% endblock %}
+    {% block fields %}{% endblock %}
 
 	{% if cart.has_items %}
-	    <input type="submit" class="button" value="{% trans "Next" %}" />
 	    {% if not CHECKOUT_STEP_FIRST %}
 	    <input type="submit" class="button" name="back" value="{% trans "Back" %}" />
 	    {% endif %}
+	    <input type="submit" class="button" value="{% trans "Next" %}" />
 	{% else %} 
     	<p>{% trans "Your cart is empty." %}</p>
 	{% endif %}
